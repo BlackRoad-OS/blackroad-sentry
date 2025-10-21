@@ -40,10 +40,11 @@ function getTagType(tag: Tag, dataset: WidgetType) {
 
 type AddFilterProps = {
   getSearchBarData: (widgetType: WidgetType) => SearchBarData;
+  globalFilters: GlobalFilter[];
   onAddFilter: (filter: GlobalFilter) => void;
 };
 
-function AddFilter({getSearchBarData, onAddFilter}: AddFilterProps) {
+function AddFilter({globalFilters, getSearchBarData, onAddFilter}: AddFilterProps) {
   const [selectedDataset, setSelectedDataset] = useState<WidgetType | null>(null);
   const [selectedFilterKey, setSelectedFilterKey] = useState<Tag | null>(null);
   const [isSelectingFilterKey, setIsSelectingFilterKey] = useState(false);
@@ -74,19 +75,29 @@ function AddFilter({getSearchBarData, onAddFilter}: AddFilterProps) {
           value: tag.key,
           label: prettifyTagKey(tag.key),
           trailingItems: <TagBadge>{getTagType(tag, selectedDataset)}</TagBadge>,
+          disabled: globalFilters.some(filter => filter.tag.key === tag.key),
         };
       })
     : [];
 
   // Footer for filter key selection for adding filters and returning to dataset selection
-  const filterOptionsMenuFooter = ({closeOverlay}: {closeOverlay: () => void}) => (
+  const filterOptionsMenuFooter = ({
+    closeOverlay,
+    resetSearch,
+  }: {
+    closeOverlay: () => void;
+    resetSearch: () => void;
+  }) => (
     <FooterWrap>
       <Flex gap="md" justify="end">
         <Button
           size="xs"
           borderless
           icon={<IconArrow direction="left" />}
-          onClick={() => setIsSelectingFilterKey(false)}
+          onClick={() => {
+            resetSearch();
+            setIsSelectingFilterKey(false);
+          }}
         >
           {t('Back')}
         </Button>
@@ -120,7 +131,11 @@ function AddFilter({getSearchBarData, onAddFilter}: AddFilterProps) {
       searchable={isSelectingFilterKey}
       sizeLimit={50}
       closeOnSelect={false}
-      clearable={false}
+      onClose={() => {
+        setSelectedFilterKey(null);
+        setSelectedDataset(null);
+        setIsSelectingFilterKey(false);
+      }}
       value={selectedFilterKey?.key ?? ''}
       onChange={(option: SelectOption<string>) => {
         if (isSelectingFilterKey) {
