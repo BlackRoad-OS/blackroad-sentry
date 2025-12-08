@@ -1799,7 +1799,7 @@ const lightThemeDefinition = {
   level: generateLevelTheme(lightColors),
 
   chart: {
-    neutral: modifyColor(lightColors.gray400).lighten(0.8).toString(),
+    neutral: color.neutral.light.opaque800,
     colors: CHART_PALETTE_LIGHT,
     getColorPalette: makeChartColorPalette(CHART_PALETTE_LIGHT),
   },
@@ -1859,7 +1859,7 @@ export const darkTheme: SentryTheme = {
   level: generateLevelTheme(darkColors),
 
   chart: {
-    neutral: modifyColor(darkColors.gray400).darken(0.35).toString(),
+    neutral: color.neutral.dark.opaque900,
     colors: CHART_PALETTE_DARK,
     getColorPalette: makeChartColorPalette(CHART_PALETTE_DARK),
   },
