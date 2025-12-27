@@ -8,6 +8,8 @@ from urllib.parse import quote
 from django.utils.translation import gettext_lazy as _
 
 from sentry import features
+from sentry.integrations.gitlab.constants import GITLAB_WEBHOOK_VERSION, GITLAB_WEBHOOK_VERSION_KEY
+from sentry.integrations.gitlab.tasks import update_all_project_webhooks
 from sentry.integrations.mixins.issues import IssueSyncIntegration, ResolveSyncAction
 from sentry.integrations.models.external_actor import ExternalActor
 from sentry.integrations.models.external_issue import ExternalIssue
@@ -175,6 +177,7 @@ class GitlabIssueSyncSpec(IssueSyncIntegration):
         return ResolveSyncAction.NOOP
 
     def get_config_data(self):
+        # Get existing config (preserves webhook version and other settings)
         config = self.org_integration.config
         project_mappings = IntegrationExternalProject.objects.filter(
             organization_integration_id=self.org_integration.id
@@ -259,13 +262,26 @@ class GitlabIssueSyncSpec(IssueSyncIntegration):
 
         config = self.org_integration.config
 
+        # Check webhook version BEFORE updating config to determine if migration is needed
+        current_webhook_version = config.get(GITLAB_WEBHOOK_VERSION_KEY, 0)
+
         config.update(data)
+
         org_integration = integration_service.update_organization_integration(
             org_integration_id=self.org_integration.id,
             config=config,
         )
         if org_integration is not None:
             self.org_integration = org_integration
+
+        # Only update webhooks if:
+        # 1. A sync setting was enabled, AND
+        # 2. The webhook version is outdated
+        if current_webhook_version < GITLAB_WEBHOOK_VERSION:
+            update_all_project_webhooks.delay(
+                integration_id=self.model.id,
+                organization_id=self.organization_id,
+            )
 
     def create_comment_attribution(self, user_id, comment_text):
         user = user_service.get_user(user_id)
