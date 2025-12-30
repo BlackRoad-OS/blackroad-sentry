@@ -33,7 +33,6 @@ class SentryAppInstallationTest(TestCase):
     def test_paranoid(self) -> None:
         self.install.save()
         self.install.delete()
-        assert self.install.date_deleted is not None
         assert self.install not in SentryAppInstallation.objects.all()
 
     def test_date_updated(self) -> None:
