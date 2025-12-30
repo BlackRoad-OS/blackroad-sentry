@@ -3777,14 +3777,6 @@ register(
     flags=FLAG_AUTOMATOR_MODIFIABLE,
 )
 
-# Manual option for hard deleting sentry apps and installations.
-register(
-    "sentry-apps.hard-delete",
-    type=Bool,
-    default=False,
-    flags=FLAG_AUTOMATOR_MODIFIABLE,
-)
-
 # Killswitch for web vital issue detection
 register(
     "issue-detection.web-vitals-detection.enabled",
