@@ -200,7 +200,7 @@ export const GridRow = styled('tr')<{isClickable?: boolean}>`
   grid-column: 1/-1;
 
   &:not(thead > &) {
-    background-color: ${p => p.theme.background};
+    background-color: ${p => p.theme.tokens.background.primary};
 
     &:not(:last-child) {
       border-bottom: 1px solid ${p => p.theme.innerBorder};
@@ -312,7 +312,7 @@ export const GridResizer = styled('div')<{dataRows: number}>`
   }
 
   &:hover::after {
-    background-color: ${p => p.theme.gray200};
+    background-color: ${p => p.theme.colors.gray200};
   }
 
   /**
@@ -321,7 +321,7 @@ export const GridResizer = styled('div')<{dataRows: number}>`
    */
   &:active::after,
   &:focus::after {
-    background-color: ${p => p.theme.purple300};
+    background-color: ${p => p.theme.colors.blue400};
   }
 
   /**
@@ -335,7 +335,7 @@ export const GridResizer = styled('div')<{dataRows: number}>`
     display: block;
     width: 7px;
     height: ${GRID_HEAD_ROW_HEIGHT}px;
-    background-color: ${p => p.theme.purple300};
+    background-color: ${p => p.theme.colors.blue400};
     opacity: 0.4;
   }
 `;

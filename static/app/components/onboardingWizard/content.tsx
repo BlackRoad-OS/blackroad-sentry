@@ -468,7 +468,7 @@ function TaskGroup({
           ) : (
             <ProgressRing
               value={(doneTasks.length / tasks.length) * 100}
-              backgroundColor={theme.gray200}
+              backgroundColor={theme.colors.gray200}
               progressEndcaps="round"
               progressColor={theme.tokens.content.accent}
               size={22}
@@ -567,7 +567,7 @@ const TaskGroupWrapper = styled('div')`
   border-radius: ${p => p.theme.radius.md};
   padding: ${space(1)};
 
-  background-color: ${p => p.theme.background};
+  background-color: ${p => p.theme.tokens.background.primary};
 
   hr {
     border-color: ${p => p.theme.translucentBorder};

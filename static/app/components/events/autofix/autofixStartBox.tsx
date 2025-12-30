@@ -111,7 +111,7 @@ export function AutofixStartBox({onSend, groupId}: AutofixStartBoxProps) {
               }}
             />
             <StartTextRow>
-              <IconSeer variant="waiting" color="textColor" size="xl" />
+              <IconSeer animation="waiting" variant="primary" size="xl" />
             </StartTextRow>
           </AutofixStartText>
           <InputWrapper onSubmit={handleSubmit}>
@@ -188,8 +188,12 @@ const Container = styled('div')`
   position: relative;
   width: 100%;
   border-radius: ${p => p.theme.radius.md};
-  background: ${p => p.theme.background}
-    linear-gradient(135deg, ${p => p.theme.pink400}08, ${p => p.theme.pink400}20);
+  background: ${p => p.theme.tokens.background.primary}
+    linear-gradient(
+      135deg,
+      ${p => p.theme.colors.pink500}08,
+      ${p => p.theme.colors.pink500}20
+    );
   overflow: visible;
   padding: ${space(0.5)};
   border: 1px solid ${p => p.theme.border};
@@ -234,7 +238,7 @@ const InputWrapper = styled('form')`
 
 const StyledInput = styled(TextArea)`
   resize: none;
-  background: ${p => p.theme.background};
+  background: ${p => p.theme.tokens.background.primary};
 
   border-color: ${p => p.theme.innerBorder};
   &:hover {

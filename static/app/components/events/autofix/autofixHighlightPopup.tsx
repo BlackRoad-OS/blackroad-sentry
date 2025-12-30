@@ -695,8 +695,8 @@ const Container = styled(motion.div, {
 })<{isFocused?: boolean}>`
   position: relative;
   width: 100%;
+  background: ${p => p.theme.tokens.background.primary};
   border-radius: ${p => p.theme.radius.md};
-  background: ${p => p.theme.background};
   border: 1px dashed ${p => p.theme.border};
   overflow: hidden;
   box-shadow: ${p => (p.isFocused ? p.theme.dropShadowHeavy : p.theme.dropShadowLight)};
@@ -827,7 +827,7 @@ const CircularSeerIcon = styled('div')`
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background: ${p => p.theme.purple300};
+  background: ${p => p.theme.colors.blue400};
   flex-shrink: 0;
 
   > svg {

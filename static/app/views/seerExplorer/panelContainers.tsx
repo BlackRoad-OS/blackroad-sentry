@@ -68,7 +68,7 @@ function PanelContainers({
                   onClick={onUnminimize}
                 >
                   <Flex direction="column" align="center" gap="md">
-                    <IconSeer variant="waiting" size="lg" />
+                    <IconSeer animation="waiting" size="lg" />
                     <Text>Press Tab ⇥ or click to continue with Seer</Text>
                   </Flex>
                 </MinimizedOverlay>
@@ -113,7 +113,7 @@ const PanelContainer = styled(motion.div)<{
     `
       : `
       width: 50vw;
-      height: 55vh;
+      height: 60vh;
       margin-left: -25vw;
     `}
 
@@ -123,7 +123,7 @@ const PanelContainer = styled(motion.div)<{
 const PanelContent = styled('div')`
   width: 100%;
   height: 100%;
-  background: ${p => p.theme.background};
+  background: ${p => p.theme.tokens.background.primary};
   border: 1px solid ${p => p.theme.border};
   border-radius: ${p => p.theme.radius.md};
   box-shadow: ${p => p.theme.dropShadowHeavy};
@@ -145,7 +145,7 @@ const MinimizedOverlay = styled(motion.div)`
   left: 0;
   right: 0;
   bottom: 0;
-  background: ${p => p.theme.background};
+  background: ${p => p.theme.tokens.background.primary};
   display: flex;
   align-items: flex-start;
   justify-content: center;
@@ -163,7 +163,7 @@ const MinimizedOverlay = styled(motion.div)`
     left: 0;
     right: 0;
     bottom: 0;
-    background: ${p => p.theme.purple200};
+    background: ${p => p.theme.colors.blue200};
     border-radius: inherit;
     z-index: -1;
     pointer-events: none;

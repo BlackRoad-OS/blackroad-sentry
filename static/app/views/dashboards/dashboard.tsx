@@ -459,14 +459,14 @@ export default Dashboard;
 // Allow the Add Widget tile to show above widgets when moved
 const AddWidgetWrapper = styled('div')`
   z-index: 5;
-  background-color: ${p => p.theme.background};
+  background-color: ${p => p.theme.tokens.background.primary};
 `;
 
 const GridLayout = styled(WidthProvider(Responsive))`
   margin: -${space(2)};
 
   .react-grid-item.react-grid-placeholder {
-    background: ${p => p.theme.purple200};
+    background: ${p => p.theme.colors.blue200};
     border-radius: ${p => p.theme.radius.md};
   }
 `;

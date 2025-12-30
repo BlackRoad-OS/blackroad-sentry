@@ -696,7 +696,7 @@ const FileDiffWrapper = styled('div')<{integratedStyle?: boolean}>`
   border-color: ${p => (p.integratedStyle ? 'transparent' : p.theme.border)};
   border-radius: ${p => p.theme.radius.md};
   overflow: hidden;
-  background-color: ${p => p.theme.background};
+  background-color: ${p => p.theme.tokens.background.primary};
 `;
 
 const FileHeader = styled('div')`
@@ -818,15 +818,15 @@ const ActionButton = styled(Button)<{isHovered: boolean}>`
   margin-left: ${space(0.5)};
   font-family: ${p => p.theme.text.family};
   background-color: ${p =>
-    p.isHovered ? p.theme.button.default.background : p.theme.background};
-  color: ${p => (p.isHovered ? p.theme.pink400 : p.theme.tokens.content.primary)};
+    p.isHovered ? p.theme.button.default.background : p.theme.tokens.background.primary};
+  color: ${p => (p.isHovered ? p.theme.colors.pink500 : p.theme.tokens.content.primary)};
   transition:
     background-color 0.2s ease-in-out,
     color 0.2s ease-in-out;
 
   &:hover {
-    background-color: ${p => p.theme.pink400}10;
-    color: ${p => p.theme.pink400};
+    background-color: ${p => p.theme.colors.pink500}10;
+    color: ${p => p.theme.colors.pink500};
   }
 `;
 
@@ -835,7 +835,7 @@ const EditOverlay = styled('div')`
   bottom: ${space(2)};
   left: 50%;
   right: ${space(2)};
-  background: ${p => p.theme.backgroundElevated};
+  background: ${p => p.theme.tokens.background.primary};
   border: 1px solid ${p => p.theme.border};
   border-radius: ${p => p.theme.radius.md};
   box-shadow: ${p => p.theme.dropShadowHeavy};
