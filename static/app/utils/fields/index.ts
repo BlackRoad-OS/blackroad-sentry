@@ -18,6 +18,7 @@ export enum FieldKind {
   EQUATION = 'equation',
   METRICS = 'metric',
   NUMERIC_METRICS = 'numeric_metric',
+  BOOLEAN = 'boolean',
 }
 
 export enum FieldKey {
@@ -3388,6 +3389,10 @@ export const getFieldDefinition = (
         return {kind: FieldKind.FIELD, valueType: FieldValueType.STRING};
       }
 
+      if (kind === FieldKind.BOOLEAN) {
+        return {kind: FieldKind.FIELD, valueType: FieldValueType.BOOLEAN};
+      }
+
       return null;
 
     case 'log':
@@ -3406,6 +3411,11 @@ export const getFieldDefinition = (
       if (kind === FieldKind.TAG) {
         return {kind: FieldKind.FIELD, valueType: FieldValueType.STRING};
       }
+
+      if (kind === FieldKind.BOOLEAN) {
+        return {kind: FieldKind.FIELD, valueType: FieldValueType.BOOLEAN};
+      }
+
       return null;
 
     case 'tracemetric':
@@ -3424,6 +3434,11 @@ export const getFieldDefinition = (
       if (kind === FieldKind.TAG) {
         return {kind: FieldKind.FIELD, valueType: FieldValueType.STRING};
       }
+
+      if (kind === FieldKind.BOOLEAN) {
+        return {kind: FieldKind.FIELD, valueType: FieldValueType.BOOLEAN};
+      }
+
       return null;
 
     case 'event':
