@@ -301,7 +301,9 @@ class GitHubEnterpriseIntegration(
         """
         config: list[dict[str, Any]] = []
 
-        if features.has("organizations:integrations-github-project-management", self.organization):
+        if features.has(
+            "organizations:integrations-github_enterprise-project-management", self.organization
+        ):
             config.extend(
                 [
                     {
