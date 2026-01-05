@@ -9,6 +9,7 @@ import {addErrorMessage, addSuccessMessage} from 'sentry/actionCreators/indicato
 import {type ModalRenderProps} from 'sentry/actionCreators/modal';
 import SelectField from 'sentry/components/forms/fields/selectField';
 import LoadingIndicator from 'sentry/components/loadingIndicator';
+import {CONSOLE_PLATFORM_METADATA} from 'sentry/constants/consolePlatforms';
 import {IconGithub} from 'sentry/icons';
 import {t, tct} from 'sentry/locale';
 import type {UserIdentityConfig} from 'sentry/types/auth';
@@ -20,14 +21,10 @@ import {
   useMutation,
   useQueryClient,
 } from 'sentry/utils/queryClient';
+import type RequestError from 'sentry/utils/requestError/requestError';
 import {useLocation} from 'sentry/utils/useLocation';
 
 type GamingPlatform = 'playstation' | 'xbox' | 'nintendo-switch';
-
-interface ConsoleSdkInviteErrorResponse {
-  detail: string;
-  error: string;
-}
 
 interface ConsoleSdkInvitePlatformError {
   error: string;
@@ -84,7 +81,7 @@ export function PrivateGamingSdkAccessModal({
 
   const {mutate} = useMutation<
     ConsoleSdkInviteResponse,
-    ConsoleSdkInviteErrorResponse,
+    RequestError,
     ConsoleSdkInviteRequest
   >({
     mutationFn: ({platforms}: ConsoleSdkInviteRequest) =>
@@ -126,9 +123,9 @@ export function PrivateGamingSdkAccessModal({
       });
     },
     onError: errorResponse => {
-      const errorMessage = tct('[error] [detail]', {
-        error: errorResponse.error,
-        detail: errorResponse.detail,
+      const errorMessage = tct('[error] - [detail]', {
+        error: errorResponse.responseJSON?.error as string,
+        detail: errorResponse.responseJSON?.detail as string,
       });
       addErrorMessage(errorMessage);
       setRequestError(errorMessage);
@@ -140,16 +137,6 @@ export function PrivateGamingSdkAccessModal({
     userIdentity => userIdentity.provider.key === 'github'
   );
   const isFormValid = hasGithubIdentity && gamingPlatforms.length > 0;
-  const readableConsoleNames = new Map([
-    ['nintendo-switch', 'Nintendo Switch'],
-    ['playstation', 'PlayStation'],
-    ['xbox', 'Xbox'],
-  ]);
-  const consoleRepositoryUrls = new Map([
-    ['nintendo-switch', 'https://github.com/getsentry/sentry-switch'],
-    ['playstation', 'https://github.com/getsentry/sentry-playstation'],
-    ['xbox', 'https://github.com/getsentry/sentry-xbox'],
-  ]);
 
   useEffect(() => {
     trackAnalytics('gaming.private_sdk_access_modal_opened', {
@@ -180,13 +167,6 @@ export function PrivateGamingSdkAccessModal({
     mutate({platforms: gamingPlatforms});
   }
 
-  function stringToConsoleOption(value: string): {label: string; value: string} {
-    return {
-      value,
-      label: readableConsoleNames.get(value) ?? value,
-    };
-  }
-
   return (
     <Fragment>
       <Header closeButton>
@@ -207,12 +187,11 @@ export function PrivateGamingSdkAccessModal({
             </p>
             <ul>
               {submittedPlatforms.map(platform => {
-                const repoUrl = consoleRepositoryUrls.get(platform);
-                const consoleName = readableConsoleNames.get(platform);
+                const metadata = CONSOLE_PLATFORM_METADATA[platform];
                 return (
                   <li key={platform}>
-                    <a href={repoUrl} target="_blank" rel="noopener noreferrer">
-                      {consoleName}
+                    <a href={metadata?.repoURL} target="_blank" rel="noopener noreferrer">
+                      {metadata?.displayName}
                     </a>
                   </li>
                 );
@@ -232,8 +211,12 @@ export function PrivateGamingSdkAccessModal({
               name="gamingPlatforms"
               label={t('Select Gaming Platforms')}
               placeholder={t('Select one or more gaming platforms')}
-              options={organization.enabledConsolePlatforms?.map(stringToConsoleOption)}
-              defaultValue={gamingPlatforms.map(stringToConsoleOption)}
+              options={organization.enabledConsolePlatforms?.map(value => ({
+                value,
+                label:
+                  CONSOLE_PLATFORM_METADATA[value as GamingPlatform]?.displayName ??
+                  value,
+              }))}
               onChange={setGamingPlatforms}
               multiple
               required
