@@ -156,7 +156,7 @@ const patterns: RegExp[] = [
   new RegExp('^auth-v2/'),
   new RegExp('^oauth/authorize/$'),
   new RegExp('^oauth/device/$'),
-  new RegExp('^oauth/device_authorization/$'),
+  new RegExp('^oauth/device/code$'),
   new RegExp('^oauth/token/$'),
   new RegExp('^oauth/userinfo/$'),
   new RegExp('^auth/2fa/u2fappid\\.json$'),
