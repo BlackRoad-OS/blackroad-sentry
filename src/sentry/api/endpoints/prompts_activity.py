@@ -42,7 +42,7 @@ class PromptsActivityEndpoint(OrganizationEndpoint):
         "PUT": ApiPublishStatus.UNKNOWN,
     }
 
-    def get(self, request: Request, **kwargs) -> Response:
+    def get(self, request: Request, organization: Organization) -> Response:
         """Return feature prompt status if dismissed or in snoozed period"""
 
         if not request.user.is_authenticated:
@@ -51,8 +51,6 @@ class PromptsActivityEndpoint(OrganizationEndpoint):
         features = request.GET.getlist("feature")
         if len(features) == 0:
             return Response({"details": "No feature specified"}, status=400)
-
-        organization = kwargs.get("organization")
         conditions: Q | None = None
         for feature in features:
             if not prompt_config.has(feature):
@@ -87,7 +85,7 @@ class PromptsActivityEndpoint(OrganizationEndpoint):
         else:
             return Response({"features": featuredata})
 
-    def put(self, request: Request, **kwargs):
+    def put(self, request: Request, organization: Organization) -> Response:
         serializer = PromptsActivitySerializer(data=request.data)
         if not serializer.is_valid():
             return Response(serializer.errors, status=400)
@@ -106,7 +104,7 @@ class PromptsActivityEndpoint(OrganizationEndpoint):
         # if NOT in required fields, insert dummy value so dups aren't recorded
         if "project_id" in required_fields:
             if not Project.objects.filter(
-                id=fields["project_id"], organization_id=request.organization.id
+                id=fields["project_id"], organization_id=organization.id
             ).exists():
                 return Response(
                     {"detail": "Project does not belong to this organization"}, status=400
@@ -115,7 +113,7 @@ class PromptsActivityEndpoint(OrganizationEndpoint):
             fields["project_id"] = 0
 
         if "organization_id" in required_fields and str(fields["organization_id"]) == str(
-            request.organization.id
+            organization.id
         ):
             if not Organization.objects.filter(id=fields["organization_id"]).exists():
                 return Response({"detail": "Organization no longer exists"}, status=400)
