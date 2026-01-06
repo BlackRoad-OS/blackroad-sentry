@@ -1,7 +1,5 @@
 ---
-created: '2019-03-14T17:12:36.101093Z'
-creator: sentry
-source: tests/sentry/event_manager/interfaces/test_single_exception.py
+source: tests/sentry/event_manager/interfaces/test_single_exception.py::test_requires_only_type_or_value
 ---
 errors: null
 to_json:

@@ -1,7 +1,5 @@
 ---
-created: '2023-10-31T14:18:43.292106Z'
-creator: sentry
-source: tests/sentry/relay/test_config.py
+source: tests/sentry/relay/test_config.py::test_get_project_config
 ---
 config:
   allowedDomains:

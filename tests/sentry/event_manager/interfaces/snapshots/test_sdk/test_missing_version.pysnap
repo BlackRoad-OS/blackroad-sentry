@@ -1,7 +1,5 @@
 ---
-created: '2019-03-14T17:12:36.082077Z'
-creator: sentry
-source: tests/sentry/event_manager/interfaces/test_sdk.py
+source: tests/sentry/event_manager/interfaces/test_sdk.py::test_missing_version
 ---
 errors:
 - name: sdk.version

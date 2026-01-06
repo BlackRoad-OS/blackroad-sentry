@@ -1,7 +1,5 @@
 ---
-created: '2019-03-14T17:12:35.565178Z'
-creator: sentry
-source: tests/sentry/event_manager/interfaces/test_frame.py
+source: tests/sentry/event_manager/interfaces/test_frame.py::test_context_with_nan
 ---
 errors: null
 to_json:

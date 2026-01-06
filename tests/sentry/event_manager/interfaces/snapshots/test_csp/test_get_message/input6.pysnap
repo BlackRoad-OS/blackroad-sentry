@@ -1,7 +1,5 @@
 ---
-created: '2020-10-13T11:56:18.307892Z'
-creator: sentry
-source: tests/sentry/event_manager/interfaces/test_csp.py
+source: tests/sentry/event_manager/interfaces/test_csp.py::test_get_message
 ---
 errors: null
 metadata:

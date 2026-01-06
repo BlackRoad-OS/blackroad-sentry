@@ -1,5 +1,5 @@
 ---
-source: tests/sentry/event_manager/interfaces/test_http.py
+source: tests/sentry/event_manager/interfaces/test_http.py::test_full
 ---
 errors: null
 to_json:

@@ -1,5 +1,5 @@
 ---
-source: tests/symbolicator/test_payload_full.py
+source: tests/symbolicator/test_payload_full.py::test_debug_id_resolving
 ---
 contexts:
   device:

@@ -1,7 +1,5 @@
 ---
-created: '2025-02-12T13:41:13.692751+00:00'
-creator: sentry
-source: tests/sentry/relay/test_config.py
+source: tests/sentry/relay/test_config.py::test_project_config_cardinality_limits
 ---
 cardinalityLimits:
 - id: transactions

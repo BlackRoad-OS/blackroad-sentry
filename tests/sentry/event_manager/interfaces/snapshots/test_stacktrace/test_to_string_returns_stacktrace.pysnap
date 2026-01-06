@@ -1,7 +1,5 @@
 ---
-created: '2019-03-14T17:12:36.603950Z'
-creator: sentry
-source: tests/sentry/event_manager/interfaces/test_stacktrace.py
+source: tests/sentry/event_manager/interfaces/test_stacktrace.py::test_to_string_returns_stacktrace
 ---
 errors:
 - name: stacktrace.frames

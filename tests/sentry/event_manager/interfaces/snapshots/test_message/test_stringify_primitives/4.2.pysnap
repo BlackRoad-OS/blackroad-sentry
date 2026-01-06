@@ -1,7 +1,5 @@
 ---
-created: '2019-03-14T17:12:36.034393Z'
-creator: sentry
-source: tests/sentry/event_manager/interfaces/test_message.py
+source: tests/sentry/event_manager/interfaces/test_message.py::test_stringify_primitives
 ---
 errors: null
 to_json:

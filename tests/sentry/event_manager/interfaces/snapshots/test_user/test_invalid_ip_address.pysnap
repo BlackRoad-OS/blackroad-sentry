@@ -1,7 +1,5 @@
 ---
-created: '2019-03-14T17:12:36.787839Z'
-creator: sentry
-source: tests/sentry/event_manager/interfaces/test_user.py
+source: tests/sentry/event_manager/interfaces/test_user.py::test_invalid_ip_address
 ---
 errors:
 - name: user.ip_address

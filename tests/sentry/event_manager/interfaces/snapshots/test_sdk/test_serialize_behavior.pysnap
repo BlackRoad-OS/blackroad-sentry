@@ -1,7 +1,5 @@
 ---
-created: '2019-03-14T17:12:36.061063Z'
-creator: sentry
-source: tests/sentry/event_manager/interfaces/test_sdk.py
+source: tests/sentry/event_manager/interfaces/test_sdk.py::test_serialize_behavior
 ---
 errors: null
 to_json:

@@ -1,7 +1,5 @@
 ---
-created: '2024-05-16T11:16:16.182568+00:00'
-creator: sentry
-source: tests/sentry/relay/test_config.py
+source: tests/sentry/relay/test_config.py::test_project_config_satisfaction_thresholds
 ---
 - condition:
     inner:

@@ -1,7 +1,5 @@
 ---
-created: '2019-05-22T14:45:12.536637Z'
-creator: sentry
-source: tests/sentry/event_manager/interfaces/test_threads.py
+source: tests/sentry/event_manager/interfaces/test_threads.py::test_null_values
 ---
 api_context: null
 errors: null

@@ -1,7 +1,5 @@
 ---
-created: '2023-01-17T00:14:25.361830Z'
-creator: sentry
-source: tests/sentry/relay/test_config.py
+source: tests/sentry/relay/test_config.py::test_project_config_with_breakdown
 ---
 breakdownsV2:
   span_ops:

@@ -1,7 +1,5 @@
 ---
-created: '2023-06-19T11:19:44.780868Z'
-creator: sentry
-source: tests/symbolicator/test_unreal_full.py
+source: tests/symbolicator/test_unreal_full.py::test_unreal_crash_with_attachments
 ---
 contexts:
   device:

@@ -1,7 +1,5 @@
 ---
-created: '2021-02-12T10:41:31.029047Z'
-creator: sentry
-source: tests/symbolicator/test_payload_full.py
+source: tests/symbolicator/test_payload_full.py::test_resolving_with_candidates_sentry_source
 ---
 - debug:
     status: ok

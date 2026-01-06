@@ -1,7 +1,5 @@
 ---
-created: '2024-05-16T13:23:17.681110+00:00'
-creator: sentry
-source: tests/sentry/api/endpoints/test_relay_globalconfig_v3.py
+source: tests/sentry/api/endpoints/test_relay_globalconfig_v3.py::test_global_config_histogram_outliers
 ---
 groups:
   histogram_outliers:

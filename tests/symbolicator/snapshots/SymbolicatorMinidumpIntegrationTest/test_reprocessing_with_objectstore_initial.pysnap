@@ -1,7 +1,5 @@
 ---
-created: '2025-11-04T11:37:39.383601+00:00'
-creator: sentry
-source: tests/symbolicator/test_minidump_full.py
+source: tests/symbolicator/test_minidump_full.py::test_reprocessing_with_objectstore_initial
 ---
 contexts:
   device:

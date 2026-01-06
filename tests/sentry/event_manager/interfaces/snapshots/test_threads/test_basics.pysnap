@@ -1,5 +1,5 @@
 ---
-source: tests/sentry/event_manager/interfaces/test_threads.py
+source: tests/sentry/event_manager/interfaces/test_threads.py::test_basics
 ---
 api_context:
   values:

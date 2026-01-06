@@ -1,7 +1,5 @@
 ---
-created: '2019-03-14T17:12:35.591021Z'
-creator: sentry
-source: tests/sentry/event_manager/interfaces/test_frame.py
+source: tests/sentry/event_manager/interfaces/test_frame.py::test_address_normalization
 ---
 errors: null
 to_json:

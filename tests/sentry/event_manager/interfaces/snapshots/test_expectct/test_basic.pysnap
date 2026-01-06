@@ -1,7 +1,5 @@
 ---
-created: '2020-10-13T11:56:18.763884Z'
-creator: sentry
-source: tests/sentry/event_manager/interfaces/test_expectct.py
+source: tests/sentry/event_manager/interfaces/test_expectct.py::test_basic
 ---
 errors: null
 metadata:

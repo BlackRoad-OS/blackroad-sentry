@@ -1,7 +1,5 @@
 ---
-created: '2019-05-22T14:45:11.372794Z'
-creator: sentry
-source: tests/sentry/event_manager/interfaces/test_debug_meta.py
+source: tests/sentry/event_manager/interfaces/test_debug_meta.py::test_symbolic_behavior_with_arch
 ---
 errors: null
 to_json:

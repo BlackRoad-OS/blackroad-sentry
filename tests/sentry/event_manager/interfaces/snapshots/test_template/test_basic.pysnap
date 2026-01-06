@@ -1,7 +1,5 @@
 ---
-created: '2019-03-14T17:12:36.653397Z'
-creator: sentry
-source: tests/sentry/event_manager/interfaces/test_template.py
+source: tests/sentry/event_manager/interfaces/test_template.py::test_basic
 ---
 api_context:
   context:

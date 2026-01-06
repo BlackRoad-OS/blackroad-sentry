@@ -1,7 +1,5 @@
 ---
-created: '2019-03-14T17:12:35.804433Z'
-creator: sentry
-source: tests/sentry/event_manager/interfaces/test_http.py
+source: tests/sentry/event_manager/interfaces/test_http.py::test_header_value_str
 ---
 errors: null
 to_json:

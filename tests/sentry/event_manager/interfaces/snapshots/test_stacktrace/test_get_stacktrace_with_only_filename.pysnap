@@ -1,7 +1,5 @@
 ---
-created: '2019-10-09T18:09:55.047738Z'
-creator: sentry
-source: tests/sentry/event_manager/interfaces/test_stacktrace.py
+source: tests/sentry/event_manager/interfaces/test_stacktrace.py::test_get_stacktrace_with_only_filename
 ---
 errors: null
 get_stacktrace: "Stacktrace (most recent call last):\n\n  File \"foo\"\n  File \"\

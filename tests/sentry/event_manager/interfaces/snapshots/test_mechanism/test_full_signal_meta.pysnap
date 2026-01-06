@@ -1,7 +1,5 @@
 ---
-created: '2019-03-14T17:12:35.950216Z'
-creator: sentry
-source: tests/sentry/event_manager/interfaces/test_mechanism.py
+source: tests/sentry/event_manager/interfaces/test_mechanism.py::test_full_signal_meta
 ---
 errors: null
 tags:

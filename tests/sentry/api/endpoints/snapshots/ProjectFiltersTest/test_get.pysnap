@@ -1,5 +1,5 @@
 ---
-source: tests/sentry/api/endpoints/test_project_filters.py
+source: tests/sentry/api/endpoints/test_project_filters.py::test_get
 ---
 - active: false
   id: browser-extensions

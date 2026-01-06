@@ -1,6 +1,4 @@
 ---
-created: '2023-01-17T00:14:27.009332Z'
-creator: sentry
-source: tests/sentry/relay/test_config.py
+source: tests/sentry/relay/test_config.py::test_project_config_with_span_attributes
 ---
 - exclusive-time

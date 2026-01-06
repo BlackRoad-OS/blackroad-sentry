@@ -1,7 +1,5 @@
 ---
-created: '2019-05-22T14:45:11.352473Z'
-creator: sentry
-source: tests/sentry/event_manager/interfaces/test_debug_meta.py
+source: tests/sentry/event_manager/interfaces/test_debug_meta.py::test_apple_behavior_with_arch
 ---
 errors: null
 to_json:

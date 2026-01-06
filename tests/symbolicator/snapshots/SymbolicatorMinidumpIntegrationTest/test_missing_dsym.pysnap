@@ -1,7 +1,5 @@
 ---
-created: '2022-07-28T11:40:16.850671Z'
-creator: sentry
-source: tests/symbolicator/test_minidump_full.py
+source: tests/symbolicator/test_minidump_full.py::test_missing_dsym
 ---
 contexts:
   device:

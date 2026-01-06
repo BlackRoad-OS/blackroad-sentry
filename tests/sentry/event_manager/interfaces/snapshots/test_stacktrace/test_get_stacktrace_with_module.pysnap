@@ -1,7 +1,5 @@
 ---
-created: '2019-03-14T17:12:36.621484Z'
-creator: sentry
-source: tests/sentry/event_manager/interfaces/test_stacktrace.py
+source: tests/sentry/event_manager/interfaces/test_stacktrace.py::test_get_stacktrace_with_module
 ---
 errors: null
 get_stacktrace: "Stacktrace (most recent call last):\n\n  Module \"foo\"\n  Module\

@@ -1,7 +1,5 @@
 ---
-created: '2019-03-14T17:12:36.119144Z'
-creator: sentry
-source: tests/sentry/event_manager/interfaces/test_single_exception.py
+source: tests/sentry/event_manager/interfaces/test_single_exception.py::test_coerces_object_value_to_string
 ---
 errors: null
 to_json:

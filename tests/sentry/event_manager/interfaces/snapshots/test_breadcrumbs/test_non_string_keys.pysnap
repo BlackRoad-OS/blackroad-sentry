@@ -1,7 +1,5 @@
 ---
-created: '2019-12-06T10:30:09.462695Z'
-creator: sentry
-source: tests/sentry/event_manager/interfaces/test_breadcrumbs.py
+source: tests/sentry/event_manager/interfaces/test_breadcrumbs.py::test_non_string_keys
 ---
 errors: null
 to_json:

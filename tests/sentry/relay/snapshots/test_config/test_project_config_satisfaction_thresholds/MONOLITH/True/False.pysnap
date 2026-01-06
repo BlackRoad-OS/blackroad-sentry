@@ -1,7 +1,5 @@
 ---
-created: '2023-03-20T11:52:04.094339Z'
-creator: sentry
-source: tests/sentry/relay/test_config.py
+source: tests/sentry/relay/test_config.py::test_project_config_cardinality_limits
 ---
 - condition:
     inner:

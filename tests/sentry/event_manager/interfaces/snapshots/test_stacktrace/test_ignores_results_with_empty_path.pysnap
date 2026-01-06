@@ -1,7 +1,5 @@
 ---
-created: '2019-12-19T00:38:25.106416Z'
-creator: sentry
-source: tests/sentry/event_manager/interfaces/test_stacktrace.py
+source: tests/sentry/event_manager/interfaces/test_stacktrace.py::test_ignores_results_with_empty_path
 ---
 errors: null
 get_stacktrace: "Stacktrace (most recent call first):\n\n  File \"http://foo.com\"\
