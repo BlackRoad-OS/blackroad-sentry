@@ -43,9 +43,10 @@ export const onboarding: OnboardingConfig = {
           showIcon: true,
           trailingItems: (
             <RequestSdkAccessButton
+              gamingPlatform="xbox"
               organization={params.organization}
               projectId={params.project.id}
-              origin="onboarding"
+              origin={params.newOrg ? 'onboarding' : 'project-creation'}
             />
           ),
         },
