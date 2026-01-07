@@ -57,6 +57,10 @@ export function useUpdateProject(project: Project) {
         data: {...data},
       });
     },
+    onSuccess: response => {
+      ProjectsStore.onUpdateSuccess(response);
+      setApiQueryData<Project>(queryClient, queryKey, response);
+    },
     onError: (_error, _variables, context) => {
       if (context?.previousProject) {
         ProjectsStore.onUpdateSuccess(context.previousProject);
