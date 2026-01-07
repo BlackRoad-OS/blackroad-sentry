@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging
 from abc import ABC, abstractmethod
+from dataclasses import dataclass, field
 from datetime import datetime
 from enum import StrEnum
 from typing import Any
@@ -33,8 +34,30 @@ from sentry.silo.base import SiloMode
 from sentry.tasks.base import instrumented_task
 from sentry.taskworker.namespaces import preprod_tasks
 from sentry.taskworker.retry import Retry
+from sentry.utils import json
 
 logger = logging.getLogger(__name__)
+
+
+@dataclass
+class StatusCheckFilter:
+    """A filter condition for status check rules."""
+
+    key: str  # e.g., "build.branch", "build.platform", "build.package_name"
+    value: str  # e.g., "main", "android", "com.example.app"
+    negated: bool = False  # If True, matches when value does NOT match
+
+
+@dataclass
+class StatusCheckRule:
+    """A rule that defines when a status check should fail."""
+
+    id: str
+    metric: str  # e.g., "install_size", "download_size"
+    measurement: str  # e.g., "absolute", "absolute_diff"
+    value: float  # Threshold value
+    unit: str  # e.g., "MB", "KB", "%"
+    filters: list[StatusCheckFilter] = field(default_factory=list)
 
 
 @instrumented_task(
@@ -122,7 +145,15 @@ def create_preprod_status_check_task(preprod_artifact_id: int, **kwargs: Any) ->
                 size_metrics_map[metrics.preprod_artifact_id] = []
             size_metrics_map[metrics.preprod_artifact_id].append(metrics)
 
-    status = _compute_overall_status(all_artifacts, size_metrics_map)
+    # Fetch status check rules from project settings
+    rules = _get_status_check_rules(preprod_artifact.project)
+
+    # TODO: Fetch base size metrics for absolute_diff calculations when baseline support is added
+    base_size_metrics_map: dict[int, list[PreprodArtifactSizeMetrics]] | None = None
+
+    status = _compute_overall_status(
+        all_artifacts, size_metrics_map, rules=rules, base_size_metrics_map=base_size_metrics_map
+    )
 
     title, subtitle, summary = format_status_check_messages(all_artifacts, size_metrics_map, status)
 
@@ -226,8 +257,233 @@ class StatusCheckErrorType(StrEnum):
     """An integration configuration error (permissions, invalid request, etc.)."""
 
 
+ENABLED_OPTION_KEY = "sentry:preprod_size_status_checks_enabled"
+RULES_OPTION_KEY = "sentry:preprod_size_status_checks_rules"
+
+
+def _get_status_check_rules(project: Project) -> list[StatusCheckRule]:
+    """
+    Fetch and parse status check rules from project options.
+
+    Returns an empty list if feature is disabled or no rules configured.
+    """
+    enabled = project.get_option(ENABLED_OPTION_KEY, default=False)
+    if not enabled:
+        return []
+
+    rules_json = project.get_option(RULES_OPTION_KEY, default=None)
+    if not rules_json:
+        return []
+
+    try:
+        rules_data = json.loads(rules_json)
+        if not isinstance(rules_data, list):
+            logger.warning(
+                "preprod.status_checks.rules.invalid_format",
+                extra={"project_id": project.id, "rules_type": type(rules_data).__name__},
+            )
+            return []
+
+        rules: list[StatusCheckRule] = []
+        for rule_dict in rules_data:
+            filters = [
+                StatusCheckFilter(
+                    key=f.get("key", ""),
+                    value=f.get("value", ""),
+                    negated=f.get("negated", False),
+                )
+                for f in rule_dict.get("filters", [])
+            ]
+            rules.append(
+                StatusCheckRule(
+                    id=rule_dict.get("id", ""),
+                    metric=rule_dict.get("metric", ""),
+                    measurement=rule_dict.get("measurement", ""),
+                    value=float(rule_dict.get("value", 0)),
+                    unit=rule_dict.get("unit", "MB"),
+                    filters=filters,
+                )
+            )
+        return rules
+    except (json.JSONDecodeError, TypeError, ValueError) as e:
+        logger.warning(
+            "preprod.status_checks.rules.parse_error",
+            extra={"project_id": project.id, "error": str(e)},
+        )
+        return []
+
+
+def _get_artifact_filter_context(artifact: PreprodArtifact) -> dict[str, str | None]:
+    """
+    Extract build metadata from an artifact for filter matching.
+
+    Returns a dict with keys matching the filter key format:
+    - build.branch: The branch name (from commit_comparison.head_ref)
+    - build.platform: "ios" or "android" (derived from artifact_type)
+    - build.package_name: The app ID (e.g., "com.example.app")
+    """
+    context: dict[str, str | None] = {}
+
+    # Extract branch from commit comparison
+    if artifact.commit_comparison and artifact.commit_comparison.head_ref:
+        context["build.branch"] = artifact.commit_comparison.head_ref
+
+    # Derive platform from artifact type
+    if artifact.artifact_type is not None:
+        if artifact.artifact_type == PreprodArtifact.ArtifactType.XCARCHIVE:
+            context["build.platform"] = "ios"
+        elif artifact.artifact_type in (
+            PreprodArtifact.ArtifactType.AAB,
+            PreprodArtifact.ArtifactType.APK,
+        ):
+            context["build.platform"] = "android"
+
+    # Extract package name from app_id
+    if artifact.app_id:
+        context["build.package_name"] = artifact.app_id
+
+    return context
+
+
+def _rule_matches_artifact(rule: StatusCheckRule, context: dict[str, str | None]) -> bool:
+    """
+    Check if a rule's filters match the artifact's context.
+
+    Filter logic:
+    - Filters with the same key are OR'd together (any match = key matches)
+    - Filters with different keys are AND'd together (all keys must match)
+    - negated=True means the value should NOT match
+
+    If a rule has no filters, it matches all artifacts.
+    """
+    if not rule.filters:
+        return True
+
+    # Group filters by key
+    filters_by_key: dict[str, list[StatusCheckFilter]] = {}
+    for f in rule.filters:
+        if f.key not in filters_by_key:
+            filters_by_key[f.key] = []
+        filters_by_key[f.key].append(f)
+
+    # For each key, check if any filter matches (OR within key)
+    # All keys must match (AND across keys)
+    for key, filters in filters_by_key.items():
+        artifact_value = context.get(key)
+
+        # Check if any filter for this key matches
+        key_matches = False
+        for f in filters:
+            if f.negated:
+                # Negated: matches if artifact value does NOT equal filter value
+                if artifact_value != f.value:
+                    key_matches = True
+                    break
+            else:
+                # Normal: matches if artifact value equals filter value
+                if artifact_value == f.value:
+                    key_matches = True
+                    break
+
+        # If no filter for this key matched, the rule doesn't match
+        if not key_matches:
+            return False
+
+    return True
+
+
+def _convert_to_bytes(value: float, unit: str) -> float:
+    """Convert a value from the given unit to bytes."""
+    if unit == "MB":
+        return value * 1024 * 1024
+    elif unit == "KB":
+        return value * 1024
+    elif unit == "%":
+        # Percentage is handled separately in threshold evaluation
+        return value
+    else:
+        # Assume bytes if unknown
+        return value
+
+
+def _get_metric_value(size_metrics: PreprodArtifactSizeMetrics, metric: str) -> int | None:
+    """Get the relevant size value from metrics based on the metric type."""
+    if metric == "install_size":
+        return size_metrics.max_install_size
+    elif metric == "download_size":
+        return size_metrics.max_download_size
+    return None
+
+
+def _evaluate_rule_threshold(
+    rule: StatusCheckRule,
+    size_metrics_list: list[PreprodArtifactSizeMetrics],
+    base_size_metrics_list: list[PreprodArtifactSizeMetrics] | None = None,
+) -> bool:
+    """
+    Check if any size metric exceeds the rule's threshold.
+
+    Returns True if the threshold is exceeded (rule triggers failure).
+
+    Measurement types:
+    - absolute: Compare the absolute size against the threshold
+    - absolute_diff: Compare the size difference from baseline against the threshold
+    """
+    threshold_bytes = _convert_to_bytes(rule.value, rule.unit)
+
+    for size_metrics in size_metrics_list:
+        if size_metrics.state != PreprodArtifactSizeMetrics.SizeAnalysisState.COMPLETED:
+            continue
+
+        current_value = _get_metric_value(size_metrics, rule.metric)
+        if current_value is None:
+            continue
+
+        if rule.measurement == "absolute":
+            # Compare absolute size against threshold
+            if current_value > threshold_bytes:
+                return True
+
+        elif rule.measurement == "absolute_diff":
+            # Compare size difference from baseline
+            if not base_size_metrics_list:
+                continue
+
+            # Find matching baseline metric
+            base_value: int | None = None
+            for base_metric in base_size_metrics_list:
+                if (
+                    base_metric.metrics_artifact_type == size_metrics.metrics_artifact_type
+                    and base_metric.identifier == size_metrics.identifier
+                    and base_metric.state == PreprodArtifactSizeMetrics.SizeAnalysisState.COMPLETED
+                ):
+                    base_value = _get_metric_value(base_metric, rule.metric)
+                    break
+
+            if base_value is None:
+                continue
+
+            diff = current_value - base_value
+
+            if rule.unit == "%":
+                # Percentage difference
+                if base_value > 0:
+                    percent_diff = (diff / base_value) * 100
+                    if percent_diff > rule.value:
+                        return True
+            else:
+                # Absolute difference in bytes
+                if diff > threshold_bytes:
+                    return True
+
+    return False
+
+
 def _compute_overall_status(
-    artifacts: list[PreprodArtifact], size_metrics_map: dict[int, list[PreprodArtifactSizeMetrics]]
+    artifacts: list[PreprodArtifact],
+    size_metrics_map: dict[int, list[PreprodArtifactSizeMetrics]],
+    rules: list[StatusCheckRule] | None = None,
+    base_size_metrics_map: dict[int, list[PreprodArtifactSizeMetrics]] | None = None,
 ) -> StatusCheckStatus:
     if not artifacts:
         raise ValueError("Cannot compute status for empty artifact list")
@@ -253,6 +509,32 @@ def _compute_overall_status(
                         size_metrics.state != PreprodArtifactSizeMetrics.SizeAnalysisState.COMPLETED
                     ):
                         return StatusCheckStatus.IN_PROGRESS
+
+        # All processing complete - now evaluate rules if configured
+        if rules:
+            for artifact in artifacts:
+                context = _get_artifact_filter_context(artifact)
+                size_metrics_list = size_metrics_map.get(artifact.id, [])
+                base_metrics_list = (
+                    base_size_metrics_map.get(artifact.id) if base_size_metrics_map else None
+                )
+
+                for rule in rules:
+                    if _rule_matches_artifact(rule, context):
+                        if _evaluate_rule_threshold(rule, size_metrics_list, base_metrics_list):
+                            logger.info(
+                                "preprod.status_checks.rule_triggered",
+                                extra={
+                                    "artifact_id": artifact.id,
+                                    "rule_id": rule.id,
+                                    "metric": rule.metric,
+                                    "measurement": rule.measurement,
+                                    "threshold": rule.value,
+                                    "unit": rule.unit,
+                                },
+                            )
+                            return StatusCheckStatus.FAILURE
+
         return StatusCheckStatus.SUCCESS
     else:
         return StatusCheckStatus.IN_PROGRESS
