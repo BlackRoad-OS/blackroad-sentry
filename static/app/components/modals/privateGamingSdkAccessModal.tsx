@@ -7,7 +7,9 @@ import {Prose} from '@sentry/scraps/text/prose';
 
 import {addErrorMessage, addSuccessMessage} from 'sentry/actionCreators/indicator';
 import {type ModalRenderProps} from 'sentry/actionCreators/modal';
+import {ExternalLink} from 'sentry/components/core/link';
 import SelectField from 'sentry/components/forms/fields/selectField';
+import LoadingError from 'sentry/components/loadingError';
 import LoadingIndicator from 'sentry/components/loadingIndicator';
 import {CONSOLE_PLATFORM_METADATA} from 'sentry/constants/consolePlatforms';
 import {IconGithub} from 'sentry/icons';
@@ -59,27 +61,24 @@ export function PrivateGamingSdkAccessModal({
   onSubmit,
   origin,
 }: PrivateGamingSdkAccessModalProps & ModalRenderProps) {
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [gamingPlatforms, setGamingPlatforms] = useState<GamingPlatform[]>(
     gamingPlatform ? [gamingPlatform] : []
   );
-  const [requestError, setRequestError] = useState<React.ReactElement | undefined>(
-    undefined
-  );
   const [submittedPlatforms, setSubmittedPlatforms] = useState<GamingPlatform[]>([]);
-  const [showSuccessView, setShowSuccessView] = useState(false);
   const location = useLocation();
   const currentPath = location.pathname + location.search;
   const queryClient = useQueryClient();
 
-  const {isPending, data: userIdentities} = useApiQuery<UserIdentityConfig[]>(
-    ['/users/me/user-identities/'],
-    {
-      staleTime: Infinity,
-    }
-  );
+  const {
+    isPending,
+    isError,
+    data: userIdentities,
+    refetch,
+  } = useApiQuery<UserIdentityConfig[]>(['/users/me/user-identities/'], {
+    staleTime: Infinity,
+  });
 
-  const {mutate} = useMutation<
+  const mutation = useMutation<
     ConsoleSdkInviteResponse,
     RequestError,
     ConsoleSdkInviteRequest
@@ -114,23 +113,24 @@ export function PrivateGamingSdkAccessModal({
           })
         );
         setSubmittedPlatforms(successfulPlatforms);
-        setShowSuccessView(true);
       }
 
-      setIsSubmitting(false);
       queryClient.invalidateQueries({
         queryKey: [`/organizations/${organization.slug}/console-sdk-invites/`],
       });
     },
     onError: errorResponse => {
       const errorMessage = tct('[error] - [detail]', {
-        error: (errorResponse.responseJSON?.error as string) || 'Error occurred',
+        error:
+          typeof errorResponse.responseJSON?.error === 'string'
+            ? errorResponse.responseJSON.error
+            : t('Error occurred'),
         detail:
-          (errorResponse.responseJSON?.detail as string) || 'Unknown Error occurred',
+          typeof errorResponse.responseJSON?.detail === 'string'
+            ? errorResponse.responseJSON.detail
+            : t('Unknown Error occurred'),
       });
       addErrorMessage(errorMessage);
-      setRequestError(errorMessage);
-      setIsSubmitting(false);
     },
   });
 
@@ -138,6 +138,7 @@ export function PrivateGamingSdkAccessModal({
     userIdentity => userIdentity.provider.key === 'github'
   );
   const isFormValid = hasGithubIdentity && gamingPlatforms.length > 0;
+  const showSuccessView = mutation.isSuccess && submittedPlatforms.length > 0;
 
   useEffect(() => {
     trackAnalytics('gaming.private_sdk_access_modal_opened', {
@@ -153,9 +154,6 @@ export function PrivateGamingSdkAccessModal({
       return;
     }
 
-    setIsSubmitting(true);
-    setRequestError(undefined);
-
     trackAnalytics('gaming.private_sdk_access_modal_submitted', {
       platform: gamingPlatform,
       project_id: projectId,
@@ -165,7 +163,7 @@ export function PrivateGamingSdkAccessModal({
     });
 
     onSubmit?.();
-    mutate({platforms: gamingPlatforms});
+    mutation.mutate({platforms: gamingPlatforms});
   }
 
   return (
@@ -191,9 +189,9 @@ export function PrivateGamingSdkAccessModal({
                 const metadata = CONSOLE_PLATFORM_METADATA[platform];
                 return (
                   <li key={platform}>
-                    <a href={metadata?.repoURL} target="_blank" rel="noopener noreferrer">
+                    <ExternalLink href={metadata?.repoURL}>
                       {metadata?.displayName}
-                    </a>
+                    </ExternalLink>
                   </li>
                 );
               })}
@@ -201,6 +199,8 @@ export function PrivateGamingSdkAccessModal({
           </Prose>
         ) : isPending ? (
           <LoadingIndicator />
+        ) : isError ? (
+          <LoadingError onRetry={refetch} />
         ) : hasGithubIdentity ? (
           <Fragment>
             <p>
@@ -238,7 +238,7 @@ export function PrivateGamingSdkAccessModal({
               icon={<IconGithub />}
               onClick={() => {
                 const separator = currentPath.includes('?') ? '&' : '?';
-                const pathWithReopenFlag = `${currentPath}${separator}reopenGamingSdkModal=true`;
+                const pathWithReopenFlag = `${currentPath}${separator}reopenGamingSdkModal=1`;
                 window.location.href = `/identity/login/github/?next=${encodeURIComponent(pathWithReopenFlag)}`;
               }}
             >
@@ -246,7 +246,20 @@ export function PrivateGamingSdkAccessModal({
             </Button>
           </Fragment>
         )}
-        {requestError && <Alert variant="danger">{requestError}</Alert>}
+        {mutation.error && (
+          <Alert variant="danger">
+            {tct('[error] - [detail]', {
+              error:
+                typeof mutation.error.responseJSON?.error === 'string'
+                  ? mutation.error.responseJSON.error
+                  : t('Error occurred'),
+              detail:
+                typeof mutation.error.responseJSON?.detail === 'string'
+                  ? mutation.error.responseJSON.detail
+                  : t('Unknown Error occurred'),
+            })}
+          </Alert>
+        )}
       </Body>
       <Footer>
         <ButtonBar>
@@ -262,9 +275,9 @@ export function PrivateGamingSdkAccessModal({
                   priority="primary"
                   onClick={handleSubmit}
                   disabled={!isFormValid}
-                  busy={isSubmitting}
+                  busy={mutation.isPending}
                 >
-                  {isSubmitting ? t('Sending Invitation') : t('Send Invitation')}
+                  {mutation.isPending ? t('Sending Invitation') : t('Send Invitation')}
                 </Button>
               )}
             </Fragment>
