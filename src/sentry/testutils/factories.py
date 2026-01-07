@@ -133,6 +133,7 @@ from sentry.organizations.services.organization import RpcOrganization, RpcUserO
 from sentry.preprod.models import (
     InstallablePreprodArtifact,
     PreprodArtifact,
+    PreprodArtifactMobileAppInfo,
     PreprodArtifactSizeComparison,
     PreprodArtifactSizeMetrics,
     PreprodBuildConfiguration,
@@ -2581,7 +2582,7 @@ class Factories:
         extras: dict | None = None,
         **kwargs,
     ) -> PreprodArtifact:
-        return PreprodArtifact.objects.create(
+        artifact = PreprodArtifact.objects.create(
             project=project,
             state=state,
             artifact_type=artifact_type,
@@ -2596,6 +2597,23 @@ class Factories:
             extras=extras,
             **kwargs,
         )
+
+        # Create PreprodArtifactMobileAppInfo with mobile app fields if any are provided
+        mobile_app_info_fields = {}
+        if build_version is not None:
+            mobile_app_info_fields["build_version"] = build_version
+        if build_number is not None:
+            mobile_app_info_fields["build_number"] = build_number
+        if app_name is not None:
+            mobile_app_info_fields["app_name"] = app_name
+
+        if mobile_app_info_fields:
+            PreprodArtifactMobileAppInfo.objects.create(
+                preprod_artifact=artifact,
+                **mobile_app_info_fields,
+            )
+
+        return artifact
 
     @staticmethod
     @assume_test_silo_mode(SiloMode.REGION)
