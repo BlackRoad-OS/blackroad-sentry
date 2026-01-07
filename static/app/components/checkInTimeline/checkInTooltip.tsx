@@ -134,5 +134,5 @@ const StatusCount = styled('td')`
 `;
 
 const StatusUnit = styled('td')`
-  color: ${p => p.theme.subText};
+  color: ${p => p.theme.tokens.content.secondary};
 `;

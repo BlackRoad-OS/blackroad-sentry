@@ -748,7 +748,7 @@ const HunkHeaderEmptySpace = styled('div')`
 const HunkHeaderContent = styled('div')`
   grid-column: 3 / -1;
   background-color: ${p => p.theme.backgroundSecondary};
-  color: ${p => p.theme.subText};
+  color: ${p => p.theme.tokens.content.secondary};
   padding: ${space(0.75)} ${space(1)} ${space(0.75)} ${space(4)};
   white-space: pre-wrap;
 `;
@@ -759,7 +759,7 @@ const LineNumber = styled('div')<{lineType: DiffLineType}>`
   user-select: none;
 
   background-color: ${p => p.theme.backgroundSecondary};
-  color: ${p => p.theme.subText};
+  color: ${p => p.theme.tokens.content.secondary};
 
   ${p =>
     p.lineType === DiffLineType.ADDED &&
@@ -920,7 +920,7 @@ const SectionTitle = styled('p')`
 
 const NoChangesMessage = styled('p')`
   margin: ${space(1)} 0;
-  color: ${p => p.theme.subText};
+  color: ${p => p.theme.tokens.content.secondary};
   font-family: ${p => p.theme.text.family};
 `;
 

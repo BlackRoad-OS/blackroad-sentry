@@ -158,7 +158,7 @@ const SubTitleWrapper = styled(FlexBox)`
 
 const StyledSubTitleText = styled('span')`
   font-size: ${p => p.theme.fontSize.md};
-  color: ${p => p.theme.subText};
+  color: ${p => p.theme.tokens.content.secondary};
 `;
 
 function TitleOp({text}: {text: string}) {
@@ -628,7 +628,7 @@ const TopOpsList = styled('div')`
 `;
 
 const HighlightsOpPct = styled('div')`
-  color: ${p => p.theme.subText};
+  color: ${p => p.theme.tokens.content.secondary};
   font-size: 14px;
 `;
 
@@ -691,7 +691,7 @@ const HighlightedAttributesWrapper = styled('div')`
 `;
 
 const HighlightedAttributeName = styled('div')`
-  color: ${p => p.theme.subText};
+  color: ${p => p.theme.tokens.content.secondary};
 `;
 
 const OpenInAIFocusButton = styled(LinkButton)`

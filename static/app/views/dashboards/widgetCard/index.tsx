@@ -550,5 +550,5 @@ const ErrorCard = styled(Placeholder)`
 
 export const WidgetDescription = styled('small')`
   ${p => p.theme.overflowEllipsis}
-  color: ${p => p.theme.subText};
+  color: ${p => p.theme.tokens.content.secondary};
 `;

@@ -76,7 +76,7 @@ function getDiamondTheme(
   if (isIssue) {
     return {
       text: t('Issue'),
-      backgroundColor: theme.subText,
+      backgroundColor: theme.tokens.content.secondary,
       // @TODO(jonasbadalic): why does the issues icon height need to be adjusted?
       icon: (props: SVGIconProps) => <IconIssues width={13} height={13} {...props} />,
     };
