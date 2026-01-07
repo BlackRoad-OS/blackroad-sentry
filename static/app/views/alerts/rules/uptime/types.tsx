@@ -78,3 +78,63 @@ type StatsBucket = {
 };
 
 export type CheckStatusBucket = [timestamp: number, stats: StatsBucket];
+
+// Uptime Assertion Types (matching Rust types from uptime-checker)
+
+export type Assertion = {
+  root: Op;
+};
+
+export type Comparison =
+  | {cmp: 'always'}
+  | {cmp: 'never'}
+  | {cmp: 'less_than'}
+  | {cmp: 'greater_than'}
+  | {cmp: 'equals'}
+  | {cmp: 'not_equal'};
+
+export type GlobPattern = {
+  value: string;
+};
+
+export type HeaderOperand =
+  | {header_op: 'none'}
+  | {header_op: 'literal'; value: string}
+  | {header_op: 'glob'; pattern: GlobPattern};
+
+export interface AndOp {
+  children: Op[];
+  op: 'and';
+}
+
+export interface OrOp {
+  children: Op[];
+  op: 'or';
+}
+
+export interface NotOp {
+  op: 'not';
+  operand: Op;
+}
+
+export interface StatusCodeOp {
+  op: 'status_code_check';
+  operator: Comparison;
+  value: number;
+}
+
+export interface JsonPathOp {
+  op: 'json_path';
+  value: string;
+}
+
+export interface HeaderCheckOp {
+  key_op: Comparison;
+  key_operand: HeaderOperand;
+  op: 'header_check';
+  value_op: Comparison;
+  value_operand: HeaderOperand;
+}
+
+export type GroupOp = AndOp | OrOp;
+export type Op = GroupOp | NotOp | StatusCodeOp | JsonPathOp | HeaderCheckOp;
