@@ -29,7 +29,7 @@ class Migration(CheckedMigration):
     is_post_deployment = False
 
     dependencies = [
-        ("sentry", "1014_add_pkce_to_apigrant"),
+        ("sentry", "1015_backfill_self_hosted_sentry_app_emails"),
     ]
 
     operations = [
