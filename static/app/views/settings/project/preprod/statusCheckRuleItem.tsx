@@ -85,7 +85,7 @@ export function StatusCheckRuleItem({
 }
 
 const ItemContainer = styled('div')`
-  border-bottom: 1px solid ${p => p.theme.innerBorder};
+  border-bottom: 1px solid ${p => p.theme.tokens.border.primary};
 
   &:last-child {
     border-bottom: none;

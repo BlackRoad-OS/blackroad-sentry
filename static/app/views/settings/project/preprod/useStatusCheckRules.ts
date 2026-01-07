@@ -15,10 +15,16 @@ export function useStatusCheckRules(project: Project) {
 
   const enabled = project.options?.[ENABLED_KEY] === true;
   const rulesJson = project.options?.[RULES_KEY] as string | undefined;
-  const rules: StatusCheckRule[] = useMemo(
-    () => (rulesJson ? JSON.parse(rulesJson) : []),
-    [rulesJson]
-  );
+  const rules: StatusCheckRule[] = useMemo(() => {
+    if (!rulesJson) {
+      return [];
+    }
+    try {
+      return JSON.parse(rulesJson);
+    } catch {
+      return [];
+    }
+  }, [rulesJson]);
 
   const config = {enabled, rules};
 
