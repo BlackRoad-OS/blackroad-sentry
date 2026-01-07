@@ -25,7 +25,7 @@ function ConsoleSDKInvitesSettings() {
   const {data: invites, isPending} = useConsoleSdkInvites(organization.slug);
   const {mutate: revokeInvite} = useRevokeConsoleSdkInvite();
 
-  if (organization.enabledConsolePlatforms?.length === 0) {
+  if ((organization.enabledConsolePlatforms?.length ?? 0) === 0) {
     return (
       <Alert variant="warning">
         {t(
@@ -52,7 +52,9 @@ function ConsoleSDKInvitesSettings() {
         {t('Manage invitations to our private gaming console SDK GitHub repositories.')}
       </TextBlock>
       {!isPending &&
-        (organization.consoleSdkInviteQuota ?? 0) <= (invites?.length ?? 0) && (
+        organization.consoleSdkInviteQuota !== undefined &&
+        organization.consoleSdkInviteQuota > 0 &&
+        organization.consoleSdkInviteQuota <= (invites?.length ?? 0) && (
           <Alert variant="info">
             {tct(
               'This organization ([orgSlug]) has used all GitHub invites available. Contact your sales representative to increase the quota.',
