@@ -101,7 +101,7 @@ export function StatusCheckRules() {
                   </Container>
                 )}
 
-                <Flex padding="md">
+                <Flex style={{padding: '12px 16px'}} borderTop="primary">
                   <AddRuleButton icon={<IconAdd />} onClick={handleAddRule}>
                     {t('Create Status Check Rule')}
                   </AddRuleButton>
