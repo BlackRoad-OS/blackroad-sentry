@@ -20,7 +20,8 @@ export function useStatusCheckRules(project: Project) {
       return [];
     }
     try {
-      return JSON.parse(rulesJson);
+      const parsed = JSON.parse(rulesJson);
+      return Array.isArray(parsed) ? parsed : [];
     } catch {
       return [];
     }

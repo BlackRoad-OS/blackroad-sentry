@@ -144,8 +144,9 @@ export function StatusCheckRuleForm({rule, onSave, onDelete}: Props) {
   }, []);
 
   const handleDelete = () => {
-    const valueWithUnit = unit === '%' ? `${value}%` : `${value} ${unit}`;
-    const ruleDescription = `${getMetricLabel(metric)} - ${getMeasurementLabel(measurement)}`;
+    const valueWithUnit =
+      rule.unit === '%' ? `${rule.value}%` : `${rule.value} ${rule.unit}`;
+    const ruleDescription = `${getMetricLabel(rule.metric)} - ${getMeasurementLabel(rule.measurement)}`;
 
     openConfirmModal({
       header: (
