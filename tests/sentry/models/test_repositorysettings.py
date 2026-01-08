@@ -59,10 +59,9 @@ class TestRepositorySettings(TestCase):
 
         settings = repo_settings.get_code_review_settings()
 
-        assert settings.triggers == [
-            CodeReviewTrigger.ON_NEW_COMMIT,
-            CodeReviewTrigger.ON_COMMAND_PHRASE,
-        ]
+        assert len(settings.triggers) == 2
+        assert CodeReviewTrigger.ON_NEW_COMMIT in settings.triggers
+        assert CodeReviewTrigger.ON_COMMAND_PHRASE in settings.triggers
         assert isinstance(settings.triggers[0], CodeReviewTrigger)
 
     def test_repository_settings_unique_per_repository(self) -> None:

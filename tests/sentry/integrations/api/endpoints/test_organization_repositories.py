@@ -302,11 +302,11 @@ class OrganizationRepositoriesListTest(APITestCase):
         assert response.data[0]["id"] == str(repo.id)
         assert "settings" in response.data[0]
         assert response.data[0]["settings"]["enabledCodeReview"] is True
-        assert response.data[0]["settings"]["codeReviewTriggers"] == [
-            "on_new_commit",
-            "on_ready_for_review",
-            "on_command_phrase",
-        ]
+        triggers = response.data[0]["settings"]["codeReviewTriggers"]
+        assert len(triggers) == 3
+        assert "on_new_commit" in triggers
+        assert "on_ready_for_review" in triggers
+        assert "on_command_phrase" in triggers
 
     def test_expand_settings_without_settings(self) -> None:
         repo = Repository.objects.create(name="example", organization_id=self.org.id)

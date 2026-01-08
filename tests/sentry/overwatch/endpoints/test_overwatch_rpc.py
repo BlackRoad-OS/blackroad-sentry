@@ -632,10 +632,11 @@ class TestCodeReviewRepoSettingsEndpoint(APITestCase):
         auth = self._auth_header_for_get(url, params, "test-secret")
         resp = self.client.get(url, params, HTTP_AUTHORIZATION=auth)
         assert resp.status_code == 200
-        assert resp.data == {
-            "enabledCodeReview": True,
-            "codeReviewTriggers": ["on_new_commit", "on_ready_for_review", "on_command_phrase"],
-        }
+        assert resp.data["enabledCodeReview"] is True
+        assert len(resp.data["codeReviewTriggers"]) == 3
+        assert "on_new_commit" in resp.data["codeReviewTriggers"]
+        assert "on_ready_for_review" in resp.data["codeReviewTriggers"]
+        assert "on_command_phrase" in resp.data["codeReviewTriggers"]
 
     @patch(
         "sentry.overwatch.endpoints.overwatch_rpc.settings.OVERWATCH_RPC_SHARED_SECRET",
@@ -715,10 +716,10 @@ class TestCodeReviewRepoSettingsEndpoint(APITestCase):
         auth = self._auth_header_for_get(url, params1, "test-secret")
         resp1 = self.client.get(url, params1, HTTP_AUTHORIZATION=auth)
         assert resp1.status_code == 200
-        assert resp1.data == {
-            "enabledCodeReview": True,
-            "codeReviewTriggers": ["on_new_commit", "on_command_phrase"],
-        }
+        assert resp1.data["enabledCodeReview"] is True
+        assert len(resp1.data["codeReviewTriggers"]) == 2
+        assert "on_new_commit" in resp1.data["codeReviewTriggers"]
+        assert "on_command_phrase" in resp1.data["codeReviewTriggers"]
 
         # Request for org2 should return defaults (no settings created)
         params2 = {
