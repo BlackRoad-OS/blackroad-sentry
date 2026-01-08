@@ -52,12 +52,28 @@ class BaseDetectorTypeValidator(CamelSnakeSerializer):
         max_length=200,
         help_text="Name of the monitor",
     )
-    type = serializers.CharField()
-    config = serializers.JSONField(default=dict)
-    owner = ActorField(required=False, allow_null=True)
-    description = serializers.CharField(required=False, allow_null=True, allow_blank=True)
-    enabled = serializers.BooleanField(required=False)
-    condition_group = BaseDataConditionGroupValidator(required=False)
+    type = serializers.CharField(
+        help_text="The type of monitor. Options are: metric_issue, foo, bar"
+    )
+    config = serializers.JSONField(
+        default=dict,
+        help_text="The detection type plus any anomaly detection fields if applicable.",
+    )
+    owner = ActorField(
+        required=False, allow_null=True, help_text="The user or team who owns the monitor. "
+    )
+    description = serializers.CharField(
+        required=False,
+        allow_null=True,
+        allow_blank=True,
+        help_text="A description of the monitor. Will be displayed in the resulting notification.",
+    )
+    enabled = serializers.BooleanField(
+        required=False, help_text="Set to False if you want to disable the monitor."
+    )
+    condition_group = BaseDataConditionGroupValidator(
+        required=False, help_text="The condition group. TODO add more here. or just 'see example'?"
+    )
 
     def validate_type(self, value: str) -> builtins.type[GroupType]:
         type = grouptype.registry.get_by_slug(value)
